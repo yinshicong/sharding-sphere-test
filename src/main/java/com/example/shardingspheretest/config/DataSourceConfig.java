@@ -102,6 +102,7 @@ public class DataSourceConfig {
 //        shardingRuleConfig.getShardingAlgorithms().put("tableShardingAlgorithm", new ShardingSphereAlgorithmConfiguration("INLINE", tableShardingAlgorithmrProps));
 //        shardingRuleConfig.setKeyGenerators();
         return shardingRuleConfig;
+
     }
 
 //    @Bean("firstDataSource")
