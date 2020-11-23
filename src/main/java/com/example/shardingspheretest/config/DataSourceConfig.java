@@ -51,25 +51,24 @@ public class DataSourceConfig {
         db0.setUsername("root");
         db0.setPassword("y*scong()");
 
-        //第一个数据库
+//        //第一个数据库
+//        DruidDataSource db1 = DruidDataSourceBuilder.create().build();
+//        db1.setUrl("jdbc:mysql://47.100.188.176:3306/sharding01");
+//        db1.setDriverClassName("com.mysql.cj.jdbc.Driver");
+//        db1.setUsername("root");
+//        db1.setPassword("y*scong()");
+//
+//        //第二个数据库
+//        DruidDataSource db2 = DruidDataSourceBuilder.create().build();
+//        db2.setUrl("jdbc:mysql://47.100.188.176:3306/sharding02");
+//        db2.setDriverClassName("com.mysql.cj.jdbc.Driver");
+//        db2.setUsername("root");
+//        db2.setPassword("y*scong()");
+//
         Map<String, DataSource> dataSourceMap = new HashMap<>(3);
-        DruidDataSource db1 = DruidDataSourceBuilder.create().build();
-        db1.setUrl("jdbc:mysql://47.100.188.176:3306/sharding01");
-        db1.setDriverClassName("com.mysql.cj.jdbc.Driver");
-        db1.setUsername("root");
-        db1.setPassword("y*scong()");
-
-        //第二个数据库
-        DruidDataSource db2 = DruidDataSourceBuilder.create().build();
-        db2.setUrl("jdbc:mysql://47.100.188.176:3306/sharding02");
-        db2.setDriverClassName("com.mysql.cj.jdbc.Driver");
-        db2.setUsername("root");
-        db2.setPassword("y*scong()");
-
         dataSourceMap.put("sharding00", db0);
-        dataSourceMap.put("sharding01", db1);
-        dataSourceMap.put("sharding02", db2);
-
+//        dataSourceMap.put("sharding01", db1);
+//        dataSourceMap.put("sharding02", db2);
         return dataSourceMap;
     }
 
@@ -81,26 +80,27 @@ public class DataSourceConfig {
     public ShardingRuleConfiguration createShardingRuleConfig() {
 
         // 配置 t_order 表规则
-        ShardingTableRuleConfiguration orderTableRuleConfig = new ShardingTableRuleConfiguration("t_user", "sharding0${0..2}.t_user_0${0..2}");
+        ShardingTableRuleConfiguration orderTableRuleConfig = new ShardingTableRuleConfiguration("t_user",
+                "sharding00.t_user_0${0..2}");
         // 配置分库策略
         orderTableRuleConfig.setDatabaseShardingStrategy(new StandardShardingStrategyConfiguration("id", "dbShardingAlgorithm"));
 //      // 配置分表策略
         orderTableRuleConfig.setTableShardingStrategy(new StandardShardingStrategyConfiguration("id", "tableShardingAlgorithm"));
+        orderTableRuleConfig.setKeyGenerateStrategy();
         // 配置分片规则
         ShardingRuleConfiguration shardingRuleConfig = new ShardingRuleConfiguration();
         shardingRuleConfig.getTables().add(orderTableRuleConfig);
 
         // 配置分库算法
         Properties dbShardingAlgorithmrProps = new Properties();
-        dbShardingAlgorithmrProps.setProperty("algorithm-expression", "sharding0${id % 3}");
+        dbShardingAlgorithmrProps.setProperty("algorithm-expression", "sharding00");
         shardingRuleConfig.getShardingAlgorithms().put("dbShardingAlgorithm", new ShardingSphereAlgorithmConfiguration("INLINE", dbShardingAlgorithmrProps));
 
-
         // 配置分表算法
-//        Properties tableShardingAlgorithmrProps = new Properties();
-//        tableShardingAlgorithmrProps.setProperty("algorithm-expression", "t_user_0${id % 3}");
-//        shardingRuleConfig.getShardingAlgorithms().put("tableShardingAlgorithm", new ShardingSphereAlgorithmConfiguration("INLINE", tableShardingAlgorithmrProps));
-//        shardingRuleConfig.setKeyGenerators();
+        Properties tableShardingAlgorithmrProps = new Properties();
+        tableShardingAlgorithmrProps.setProperty("algorithm-expression", "t_user_0${id % 3}");
+        shardingRuleConfig.getShardingAlgorithms().put("tableShardingAlgorithm", new ShardingSphereAlgorithmConfiguration("INLINE", tableShardingAlgorithmrProps));
+        shardingRuleConfig.setKeyGenerators();
         return shardingRuleConfig;
 
     }
