@@ -52,7 +52,7 @@
                enableCountByExample="true" enableUpdateByExample="true"
                enableDeleteByExample="true" enableSelectByExample="true"
                selectByExampleQueryId="true" selectByPrimaryKeyQueryId="true" enableInsert="true">
-            <generatedKey column="id" sqlStatement="Mysql" identity="true"/>
+            <!--<generatedKey column="id" sqlStatement="Mysql" identity="true"/>-->
             <!--<columnRenamingRule searchString="^D_"
                                 replaceString=""/>-->
         </table>

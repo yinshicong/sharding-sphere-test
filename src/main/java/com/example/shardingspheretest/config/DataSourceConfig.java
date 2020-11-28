@@ -8,8 +8,10 @@ import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.shardingsphere.driver.api.ShardingSphereDataSourceFactory;
 import org.apache.shardingsphere.infra.config.algorithm.ShardingSphereAlgorithmConfiguration;
 import org.apache.shardingsphere.sharding.algorithm.keygen.SnowflakeKeyGenerateAlgorithm;
+import org.apache.shardingsphere.sharding.algorithm.sharding.inline.InlineShardingAlgorithm;
 import org.apache.shardingsphere.sharding.api.config.ShardingRuleConfiguration;
 import org.apache.shardingsphere.sharding.api.config.rule.ShardingTableRuleConfiguration;
+import org.apache.shardingsphere.sharding.api.config.strategy.keygen.KeyGenerateStrategyConfiguration;
 import org.apache.shardingsphere.sharding.api.config.strategy.sharding.StandardShardingStrategyConfiguration;
 import org.apache.shardingsphere.sharding.api.sharding.standard.StandardShardingAlgorithm;
 import org.mybatis.spring.SqlSessionFactoryBean;
@@ -27,6 +29,11 @@ import java.util.Properties;
 
 @Configuration
 public class DataSourceConfig {
+
+    @Bean
+    public SnowflakeKeyGenerateAlgorithm snowflakeKeyGenerateAlgorithm() {
+        return new SnowflakeKeyGenerateAlgorithm();
+    }
 
     @Bean
     public DataSource dataSource() throws SQLException {
@@ -79,30 +86,49 @@ public class DataSourceConfig {
      */
     public ShardingRuleConfiguration createShardingRuleConfig() {
 
-        // 配置 t_order 表规则
-        ShardingTableRuleConfiguration orderTableRuleConfig = new ShardingTableRuleConfiguration("t_user",
-                "sharding00.t_user_0${0..2}");
-        // 配置分库策略
-        orderTableRuleConfig.setDatabaseShardingStrategy(new StandardShardingStrategyConfiguration("id", "dbShardingAlgorithm"));
-//      // 配置分表策略
-        orderTableRuleConfig.setTableShardingStrategy(new StandardShardingStrategyConfiguration("id", "tableShardingAlgorithm"));
-        orderTableRuleConfig.setKeyGenerateStrategy();
         // 配置分片规则
         ShardingRuleConfiguration shardingRuleConfig = new ShardingRuleConfiguration();
-        shardingRuleConfig.getTables().add(orderTableRuleConfig);
-
-        // 配置分库算法
-        Properties dbShardingAlgorithmrProps = new Properties();
-        dbShardingAlgorithmrProps.setProperty("algorithm-expression", "sharding00");
-        shardingRuleConfig.getShardingAlgorithms().put("dbShardingAlgorithm", new ShardingSphereAlgorithmConfiguration("INLINE", dbShardingAlgorithmrProps));
-
+        //表配置
+        shardingRuleConfig.getTables().add(userTableRuleConfig());
         // 配置分表算法
         Properties tableShardingAlgorithmrProps = new Properties();
         tableShardingAlgorithmrProps.setProperty("algorithm-expression", "t_user_0${id % 3}");
+        /**
+         * ShardingSphereAlgorithmConfiguration的构造函数type参数见
+         * @see InlineShardingAlgorithm#getType()}
+         */
         shardingRuleConfig.getShardingAlgorithms().put("tableShardingAlgorithm", new ShardingSphereAlgorithmConfiguration("INLINE", tableShardingAlgorithmrProps));
-        shardingRuleConfig.setKeyGenerators();
+
+
+        // 配置分布式主键
+        Properties keyProps = new Properties();
+        /**
+         * ShardingSphereAlgorithmConfiguration的构造函数type参数见
+         *  @see SnowflakeKeyGenerateAlgorithm#getType()
+         */
+        shardingRuleConfig.getKeyGenerators().put("snowflakeKeyGenerateAlgorithm", new ShardingSphereAlgorithmConfiguration("SNOWFLAKE", keyProps));
         return shardingRuleConfig;
 
+    }
+
+    public ShardingTableRuleConfiguration userTableRuleConfig() {
+
+        //表设置
+        ShardingTableRuleConfiguration shardingTableRuleConfiguration = new ShardingTableRuleConfiguration("t_user",
+                "sharding00.t_user_0${0..2}");
+        /**
+         * 设置表的主键生成策略见 ShardingRuleConfiguration 配置类的 shardingAlgorithms 属性的map的主键。
+         * @see ShardingRuleConfiguration#getShardingAlgorithms()
+         */
+        shardingTableRuleConfiguration.setTableShardingStrategy(new StandardShardingStrategyConfiguration("id", "tableShardingAlgorithm"));
+
+        /**
+         * 设置表的主键生成策略见 ShardingRuleConfiguration 配置类的 keyGenerators属性的map的主键。
+         * @see ShardingRuleConfiguration#getKeyGenerators()
+         */
+        shardingTableRuleConfiguration.setKeyGenerateStrategy(new KeyGenerateStrategyConfiguration("id",
+                "snowflakeKeyGenerateAlgorithm"));
+        return shardingTableRuleConfiguration;
     }
 
 //    @Bean("firstDataSource")

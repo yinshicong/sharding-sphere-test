@@ -96,24 +96,21 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.example.shardingspheretest.model.po.User">
-    <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Integer">
-      SELECT LAST_INSERT_ID()
-    </selectKey>
-    insert into t_user (name, gender, age, 
-      nationality, areaCode, born_date, 
-      birthday, create_date, create_user
-      )
-    values (#{name,jdbcType=VARCHAR}, #{gender,jdbcType=INTEGER}, #{age,jdbcType=INTEGER}, 
-      #{nationality,jdbcType=INTEGER}, #{areacode,jdbcType=INTEGER}, #{bornDate,jdbcType=DATE}, 
-      #{birthday,jdbcType=VARCHAR}, #{createDate,jdbcType=TIMESTAMP}, #{createUser,jdbcType=VARCHAR}
-      )
+    insert into t_user (id, name, gender, 
+      age, nationality, areaCode, 
+      born_date, birthday, create_date, 
+      create_user)
+    values (#{id,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{gender,jdbcType=INTEGER}, 
+      #{age,jdbcType=INTEGER}, #{nationality,jdbcType=INTEGER}, #{areacode,jdbcType=INTEGER}, 
+      #{bornDate,jdbcType=DATE}, #{birthday,jdbcType=VARCHAR}, #{createDate,jdbcType=TIMESTAMP}, 
+      #{createUser,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.example.shardingspheretest.model.po.User">
-    <selectKey keyProperty="id" order="AFTER" resultType="java.lang.Integer">
-      SELECT LAST_INSERT_ID()
-    </selectKey>
     insert into t_user
     <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
       <if test="name != null">
         name,
       </if>
@@ -143,6 +140,9 @@
       </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
       <if test="name != null">
         #{name,jdbcType=VARCHAR},
       </if>
