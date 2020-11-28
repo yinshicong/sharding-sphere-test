@@ -1,6 +1,8 @@
 package com.example.shardingspheretest.controller;
 
+import com.example.shardingspheretest.model.request.OrderParam;
 import com.example.shardingspheretest.model.request.UserParam;
+import com.example.shardingspheretest.service.OrderUser;
 import com.example.shardingspheretest.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,16 +16,24 @@ import org.springframework.web.bind.annotation.RestController;
  * @Description:
  */
 @RestController
-@RequestMapping("test")
+@RequestMapping("api")
 public class TestController {
 
     @Autowired
     private UserService userService;
+    @Autowired
+    private OrderUser orderUser;
 
-    @PostMapping("t")
-    public String test(@RequestBody UserParam userParam) {
-        userService.insert(userParam);
-        return "hello world~";
+    @PostMapping("createUser")
+    public String createUser(@RequestBody UserParam userParam) {
+        userService.createUser(userParam);
+        return "createUser success~";
+    }
+
+    @PostMapping("createOrder")
+    public String createOrder(@RequestBody OrderParam orderParam) {
+        orderUser.createOrder(orderParam);
+        return "createOrder success~";
     }
 
 }

@@ -20,7 +20,7 @@
 
         <!-- 配置数据库连接信息 -->
         <jdbcConnection driverClass="com.mysql.cj.jdbc.Driver"
-                        connectionURL="jdbc:mysql://47.100.188.176:3306/sharding01" userId="root"
+                        connectionURL="jdbc:mysql://47.100.188.176:3306/sharding00" userId="root"
                         password="y*scong()"/>
 
         <!-- 生成model类，targetPackage指定model类的包名，targetProject指定生成的model放在哪个工程中 -->
@@ -48,7 +48,15 @@
                enableDeleteByExample="false" enableSelectByExample="false"
                selectByExampleQueryId="false"/>-->
         <!-- 数据库表以及对应的java模型类名（如果是多个表的话，可以复制多份然后修改成对应的表以及需要生成的模型名） -->
-        <table tableName="t_user" domainObjectName="User"
+        <table tableName="t_user"  domainObjectName="User"
+               enableCountByExample="true" enableUpdateByExample="true"
+               enableDeleteByExample="true" enableSelectByExample="true"
+               selectByExampleQueryId="true" selectByPrimaryKeyQueryId="true" enableInsert="true">
+            <!--<generatedKey column="id" sqlStatement="Mysql" identity="true"/>-->
+            <!--<columnRenamingRule searchString="^D_"
+                                replaceString=""/>-->
+        </table>
+        <table tableName="t_order" domainObjectName="Order"
                enableCountByExample="true" enableUpdateByExample="true"
                enableDeleteByExample="true" enableSelectByExample="true"
                selectByExampleQueryId="true" selectByPrimaryKeyQueryId="true" enableInsert="true">

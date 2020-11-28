@@ -1,5 +1,6 @@
 package com.example.shardingspheretest.service;
 
+import com.alibaba.druid.support.json.JSONUtils;
 import com.example.shardingspheretest.dal.dao.UserMapper;
 import com.example.shardingspheretest.model.po.User;
 import com.example.shardingspheretest.model.request.UserParam;
@@ -19,7 +20,7 @@ public class UserService {
     @Autowired
     private UserMapper userMapper;
 
-    public void insert(UserParam userParam) {
+    public void createUser(UserParam userParam) {
         User user = new User();
         BeanUtils.copyProperties(userParam, user);
         userMapper.insertSelective(user);
