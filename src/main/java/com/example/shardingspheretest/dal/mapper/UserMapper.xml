@@ -2,7 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.shardingspheretest.dal.dao.UserMapper">
   <resultMap id="BaseResultMap" type="com.example.shardingspheretest.model.po.User">
-    <result column="id" jdbcType="INTEGER" property="id" />
+    <id column="id" jdbcType="BIGINT" property="id" />
     <result column="name" jdbcType="VARCHAR" property="name" />
     <result column="gender" jdbcType="INTEGER" property="gender" />
     <result column="age" jdbcType="INTEGER" property="age" />
@@ -12,6 +12,7 @@
     <result column="birthday" jdbcType="VARCHAR" property="birthday" />
     <result column="create_date" jdbcType="TIMESTAMP" property="createDate" />
     <result column="create_user" jdbcType="VARCHAR" property="createUser" />
+    <result column="remark" jdbcType="VARCHAR" property="remark" />
   </resultMap>
   <sql id="Example_Where_Clause">
     <where>
@@ -72,7 +73,8 @@
     </where>
   </sql>
   <sql id="Base_Column_List">
-    id, name, gender, age, nationality, areaCode, born_date, birthday, create_date, create_user
+    id, [name], gender, age, nationality, areaCode, born_date, birthday, create_date, 
+    create_user, remark
   </sql>
   <select id="selectByExample" parameterType="com.example.shardingspheretest.model.po.UserExample" resultMap="BaseResultMap">
     select
@@ -89,6 +91,16 @@
       order by ${orderByClause}
     </if>
   </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 'true' as QUERYID,
+    <include refid="Base_Column_List" />
+    from t_user
+    where id = #{id,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from t_user
+    where id = #{id,jdbcType=BIGINT}
+  </delete>
   <delete id="deleteByExample" parameterType="com.example.shardingspheretest.model.po.UserExample">
     delete from t_user
     <if test="_parameter != null">
@@ -96,14 +108,14 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.example.shardingspheretest.model.po.User">
-    insert into t_user (id, name, gender, 
+    insert into t_user (id, [name], gender, 
       age, nationality, areaCode, 
       born_date, birthday, create_date, 
-      create_user)
-    values (#{id,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, #{gender,jdbcType=INTEGER}, 
+      create_user, remark)
+    values (#{id,jdbcType=BIGINT}, #{name,jdbcType=VARCHAR}, #{gender,jdbcType=INTEGER}, 
       #{age,jdbcType=INTEGER}, #{nationality,jdbcType=INTEGER}, #{areacode,jdbcType=INTEGER}, 
       #{bornDate,jdbcType=DATE}, #{birthday,jdbcType=VARCHAR}, #{createDate,jdbcType=TIMESTAMP}, 
-      #{createUser,jdbcType=VARCHAR})
+      #{createUser,jdbcType=VARCHAR}, #{remark,jdbcType=VARCHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.example.shardingspheretest.model.po.User">
     insert into t_user
@@ -112,7 +124,7 @@
         id,
       </if>
       <if test="name != null">
-        name,
+        [name],
       </if>
       <if test="gender != null">
         gender,
@@ -138,10 +150,13 @@
       <if test="createUser != null">
         create_user,
       </if>
+      <if test="remark != null">
+        remark,
+      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides=",">
       <if test="id != null">
-        #{id,jdbcType=INTEGER},
+        #{id,jdbcType=BIGINT},
       </if>
       <if test="name != null">
         #{name,jdbcType=VARCHAR},
@@ -170,6 +185,9 @@
       <if test="createUser != null">
         #{createUser,jdbcType=VARCHAR},
       </if>
+      <if test="remark != null">
+        #{remark,jdbcType=VARCHAR},
+      </if>
     </trim>
   </insert>
   <select id="countByExample" parameterType="com.example.shardingspheretest.model.po.UserExample" resultType="java.lang.Long">
@@ -182,10 +200,10 @@
     update t_user
     <set>
       <if test="record.id != null">
-        id = #{record.id,jdbcType=INTEGER},
+        id = #{record.id,jdbcType=BIGINT},
       </if>
       <if test="record.name != null">
-        name = #{record.name,jdbcType=VARCHAR},
+        [name] = #{record.name,jdbcType=VARCHAR},
       </if>
       <if test="record.gender != null">
         gender = #{record.gender,jdbcType=INTEGER},
@@ -211,6 +229,9 @@
       <if test="record.createUser != null">
         create_user = #{record.createUser,jdbcType=VARCHAR},
       </if>
+      <if test="record.remark != null">
+        remark = #{record.remark,jdbcType=VARCHAR},
+      </if>
     </set>
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
@@ -218,8 +239,8 @@
   </update>
   <update id="updateByExample" parameterType="map">
     update t_user
-    set id = #{record.id,jdbcType=INTEGER},
-      name = #{record.name,jdbcType=VARCHAR},
+    set id = #{record.id,jdbcType=BIGINT},
+      [name] = #{record.name,jdbcType=VARCHAR},
       gender = #{record.gender,jdbcType=INTEGER},
       age = #{record.age,jdbcType=INTEGER},
       nationality = #{record.nationality,jdbcType=INTEGER},
@@ -227,9 +248,60 @@
       born_date = #{record.bornDate,jdbcType=DATE},
       birthday = #{record.birthday,jdbcType=VARCHAR},
       create_date = #{record.createDate,jdbcType=TIMESTAMP},
-      create_user = #{record.createUser,jdbcType=VARCHAR}
+      create_user = #{record.createUser,jdbcType=VARCHAR},
+      remark = #{record.remark,jdbcType=VARCHAR}
     <if test="_parameter != null">
       <include refid="Update_By_Example_Where_Clause" />
     </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.example.shardingspheretest.model.po.User">
+    update t_user
+    <set>
+      <if test="name != null">
+        [name] = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="gender != null">
+        gender = #{gender,jdbcType=INTEGER},
+      </if>
+      <if test="age != null">
+        age = #{age,jdbcType=INTEGER},
+      </if>
+      <if test="nationality != null">
+        nationality = #{nationality,jdbcType=INTEGER},
+      </if>
+      <if test="areacode != null">
+        areaCode = #{areacode,jdbcType=INTEGER},
+      </if>
+      <if test="bornDate != null">
+        born_date = #{bornDate,jdbcType=DATE},
+      </if>
+      <if test="birthday != null">
+        birthday = #{birthday,jdbcType=VARCHAR},
+      </if>
+      <if test="createDate != null">
+        create_date = #{createDate,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createUser != null">
+        create_user = #{createUser,jdbcType=VARCHAR},
+      </if>
+      <if test="remark != null">
+        remark = #{remark,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.example.shardingspheretest.model.po.User">
+    update t_user
+    set [name] = #{name,jdbcType=VARCHAR},
+      gender = #{gender,jdbcType=INTEGER},
+      age = #{age,jdbcType=INTEGER},
+      nationality = #{nationality,jdbcType=INTEGER},
+      areaCode = #{areacode,jdbcType=INTEGER},
+      born_date = #{bornDate,jdbcType=DATE},
+      birthday = #{birthday,jdbcType=VARCHAR},
+      create_date = #{createDate,jdbcType=TIMESTAMP},
+      create_user = #{createUser,jdbcType=VARCHAR},
+      remark = #{remark,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=BIGINT}
   </update>
 </mapper>

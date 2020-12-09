@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.shardingspheretest.dal.dao.UserMapperCustomer">
+
+  <select id="listPage" resultType="com.example.shardingspheretest.model.po.User"
+          parameterType="com.example.shardingspheretest.model.request.ListUserParam">
+    select
+    id, name, gender, age, nationality, areaCode, born_date, birthday, create_date, create_user,remark
+    from
+    t_user
+    where
+    1=1
+    <if test="name != null and name != ''">
+      name like (%#{name}%);
+    </if>
+    order by create_date desc
+  </select>
+
+</mapper>

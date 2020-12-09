@@ -20,16 +20,23 @@ import java.util.List;
  * @Description:
  */
 @RestController
-@RequestMapping("api")
-public class TestController {
+@RequestMapping("api/user")
+public class UserController {
 
     @Autowired
     private UserService userService;
 
-    @PostMapping("createUser")
-    public String createUser(@RequestBody UserParam userParam) {
-        userService.createUser(userParam);
-        return "createUser success~";
+    @PostMapping("list")
+    public List<ListUserVO> list(@RequestBody ListUserParam listUserParam) {
+        List<ListUserVO> list =  userService.list(listUserParam);
+        return list;
     }
+
+//    @PostMapping("createOrder")
+//    public String createOrder(@RequestBody OrderParam orderParam) {
+//        userService.createUser(orderParam);
+//        return "createOrder success~";
+//    }
+
 
 }

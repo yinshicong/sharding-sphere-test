@@ -3,7 +3,7 @@ package com.example.shardingspheretest.model.po;
 import java.util.Date;
 
 public class User {
-    private Integer id;
+    private Long id;
 
     private String name;
 
@@ -23,11 +23,13 @@ public class User {
 
     private String createUser;
 
-    public Integer getId() {
+    private String remark;
+
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -101,5 +103,13 @@ public class User {
 
     public void setCreateUser(String createUser) {
         this.createUser = createUser == null ? null : createUser.trim();
+    }
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark == null ? null : remark.trim();
     }
 }
